@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upper Limb Anatomy Test</title>
+  <style>
+    /* ── Design Tokens ── */
+    :root {
+      --bg: oklch(0.98 0.01 240);
+      --surface: oklch(1 0 0);
+      --ink: oklch(0.2 0.02 240);
+      --ink-muted: oklch(0.5 0.02 240);
+      --accent: oklch(0.5 0.18 245);
+      --accent-soft: oklch(0.95 0.02 245);
+      --success: oklch(0.55 0.15 150);
+      --success-soft: oklch(0.96 0.03 150);
+      --error: oklch(0.55 0.18 25);
+      --error-soft: oklch(0.96 0.03 25);
+      --radius: 12px;
+      --shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 4rem 1rem 8rem;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ── Header ── */
+    .header-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 3rem 2.5rem 2.5rem;
+      box-shadow: var(--shadow);
+      border-top: 6px solid var(--accent);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-card::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0;
+      width: 150px; height: 150px;
+      background: var(--accent);
+      opacity: 0.03;
+      border-radius: 50%;
+      transform: translate(50%, -50%);
+    }
+
+    .header-card h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+
+    .header-card .meta {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .meta span::after { content: "•"; margin-left: 0.75rem; opacity: 0.3; }
+    .meta span:last-child::after { content: none; }
+
+    .required-note {
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--error);
+      background: var(--error-soft);
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    /* ── Question Cards ── */
+    .question-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 2rem 2.5rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+
+    .question-card:hover { box-shadow: var(--shadow-lg); }
+
+    .type-label {
+      font-size: 0.625rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 1.25rem;
+      display: inline-block;
+    }
+
+    .type-mcq   { background: oklch(0.9 0.05 245);  color: oklch(0.4 0.15 245); }
+    .type-short { background: oklch(0.92 0.05 150);  color: oklch(0.35 0.15 150); }
+    .type-essay { background: oklch(0.92 0.05 30);   color: oklch(0.35 0.15 30); }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .question-text {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .question-text strong { color: var(--accent); margin-right: 0.5rem; }
+
+    .marks-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      background: var(--bg);
+      padding: 0.25rem 0.625rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* ── MCQ Options ── */
+    .options { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border: 1px solid oklch(0.9 0 0);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9375rem;
+      transition: all 0.2s ease;
+    }
+
+    .option-label:hover { background: var(--bg); border-color: var(--accent); }
+
+    .option-label input[type="radio"] {
+      width: 1.25rem;
+      height: 1.25rem;
+      accent-color: var(--accent);
+    }
+
+    /* ── Answer highlighting (review mode) ── */
+    .opt-correct { background: var(--success-soft) !important; border-color: var(--success) !important; font-weight: 600; }
+    .opt-wrong   { background: var(--error-soft)   !important; border-color: var(--error)   !important; }
+
+    /* ── Text Inputs ── */
+    .short-input, .essay-input {
+      width: 100%;
+      border: 1px solid oklch(0.9 0 0);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--ink);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: var(--bg);
+    }
+
+    .short-input:focus, .essay-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+      background: var(--surface);
+    }
+
+    .essay-input { min-height: 160px; resize: vertical; }
+
+    /* ── Submit button ── */
+    .submit-section { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-top: 2rem; }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 1.25rem 3rem;
+      border-radius: 9999px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 14px 0 oklch(0.5 0.15 245 / 0.3);
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: oklch(0.45 0.18 245);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px 0 oklch(0.5 0.15 245 / 0.4);
+    }
+    
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Review banner ── */
+    .review-banner {
+      background: var(--success-soft);
+      color: var(--success);
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius);
+      border-left: 4px solid var(--success);
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+
+    .review-banner strong { display: block; font-size: 1.125rem; margin-bottom: 0.25rem; }
+
+    .answer-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-bottom: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .answer-display {
+      background: var(--bg);
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: var(--ink);
+      border: 1px solid oklch(0.9 0 0);
+    }
+
+    .answer-display em { color: var(--ink-muted); font-style: italic; }
+
+    /* ── Pagination bar ── */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem 0;
+    }
+
+    .btn-page {
+      background: var(--surface);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .btn-page:hover:not(:disabled) { background: var(--accent); color: white; }
+    .btn-page:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .page-indicator {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      min-width: 90px;
+      text-align: center;
+    }
+
+    /* ── Progress bar (sticky footer) ── */
+    .progress-footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid oklch(0.92 0 0);
+      padding: 0.625rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 100;
+      box-shadow: 0 -2px 8px rgb(0 0 0 / 0.06);
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 6px;
+      background: oklch(0.92 0 0);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    /* ── Save indicator ── */
+    .save-toast {
+      position: fixed;
+      bottom: 4rem; right: 1.5rem;
+      background: var(--ink);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 200;
+    }
+
+    .save-toast.visible { opacity: 1; }
+
+    /* ── Session panel ── */
+    .session-bar {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .btn-session {
+      background: var(--bg);
+      color: var(--ink-muted);
+      border: 1px solid oklch(0.88 0 0);
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-session:hover { border-color: var(--accent); color: var(--accent); }
+
+    .session-list {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .session-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.875rem;
+      background: var(--bg);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 1px solid oklch(0.9 0 0);
+      transition: border-color 0.2s;
+    }
+
+    .session-item:hover { border-color: var(--accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      body { padding: 2rem 1rem 4rem; }
+      .header-card, .question-card { padding: 1.5rem; }
+      .header-card h1 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-card">
+      <h1>Upper Limb Anatomy</h1>
+      <div class="meta">
+        <span>Anatomy Questions</span>
+        <span>83 Questions</span>
+        <span>Mixed Difficulty</span>
+      </div>
+      <div class="session-bar">
+        <button class="btn-session" id="btn-save-session">Save Session</button>
+        <button class="btn-session" id="btn-load-session">Manage Sessions</button>
+      </div>
+      <div id="session-panel" style="display:none;">
+        <div class="session-list" id="session-list"></div>
+      </div>
+    </div>
+
+    <div id="review-banner-container"></div>
+    <div id="questions-container"></div>
+
+    <div class="pagination-bar" id="pagination-bar">
+      <button class="btn-page" id="btn-prev" disabled>← Previous</button>
+      <div class="page-indicator" id="page-indicator">Page 1 of 5</div>
+      <button class="btn-page" id="btn-next">Next →</button>
+    </div>
+
+    <div class="submit-section" id="submit-section">
+      <button class="btn-submit" id="btn-submit">Submit Test</button>
+      <button class="btn-session" id="btn-retake" style="display:none; margin-top: 1rem;">Retake Test</button>
+    </div>
+  </div>
+
+  <div class="progress-footer">
+    <div class="progress-label" id="progress-label">0 / 83 answered</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <div class="save-toast" id="save-toast">Saved ✓</div>
+
+  <script>
+    /*
+     * Generated from: anatomy questions.pdf
+     * Topic: Upper Limb Anatomy
+     * Mode: Parsed from file
+     * Difficulty: Final-year Medical Student
+     * Total marks: 83
+     * Questions: 83
+     * Pages: 5
+     */
+
+    const questions = [
+  {
+    "id": 1,
+    "type": "mcq",
+    "text": "Which of the following is NOT true regarding the clavicle?",
+    "options": [
+      "(A) Its medial end is enlarged where it attaches to the sternum.",
+      "(B) Its lateral end is flat where it articulates with the humerus.",
+      "(C) The medial two-thirds of the shaft are convex anteriorly.",
+      "(D) The clavicle transmits shock from the upper limb to the axial skeleton.",
+      "(E) The clavicle is a \"long bone\" that has no medullary cavity."
+    ],
+    "correct": "(B) Its lateral end is flat where it articulates with the humerus.",
+    "marks": 1
+  },
+  {
+    "id": 2,
+    "type": "mcq",
+    "text": "The trapezius attaches to which of the following regions of the clavicle?",
+    "options": [
+      "(A) lateral one-third of the clavicle",
+      "(B) conoid tubercle",
+      "(C) subclavian groove",
+      "(D) trapezoid line",
+      "(E) quadrangular tubercle"
+    ],
+    "correct": "(A) lateral one-third of the clavicle",
+    "marks": 1
+  },
+  {
+    "id": 3,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the scapula?",
+    "options": [
+      "(A) The spine of the scapula continues laterally as the coracoid process.",
+      "(B) The lateral surface of the scapula forms the glenoid cavity.",
+      "(C) The acromion is superior to the glenoid cavity and projects anterolaterally.",
+      "(D) The scapula is fastened securely to the thoracic cage at the scapulothoracic joint.",
+      "(E) The acromioclavicular joint represents the true shoulder joint."
+    ],
+    "correct": "(B) The lateral surface of the scapula forms the glenoid cavity.",
+    "marks": 1
+  },
+  {
+    "id": 4,
+    "type": "mcq",
+    "text": "Which of the following is NOT included in the condyle of the humerus?",
+    "options": [
+      "(A) radial, coronoid, and olecranon fossae",
+      "(B) epicondyles",
+      "(C) trochlea",
+      "(D) capitulum",
+      "(E) greater tubercle"
+    ],
+    "correct": "(E) greater tubercle",
+    "marks": 1
+  },
+  {
+    "id": 5,
+    "type": "mcq",
+    "text": "Which of the following is NOT true in respect to the ulna and radius?",
+    "options": [
+      "(A) The brachialis attaches to the tuberosity of the ulna.",
+      "(B) The ulnar styloid process is much larger than the radial styloid process and extends farther distally.",
+      "(C) The head of the ulna lies distally, whereas the head of the radius articulates with the humerus.",
+      "(D) The ulna is medial to the radius in the anatomical position.",
+      "(E) The bodies of these bones are firmly bound together by the interosseous membrane."
+    ],
+    "correct": "(B) The ulnar styloid process is much larger than the radial styloid process and extends farther distally.",
+    "marks": 1
+  },
+  {
+    "id": 6,
+    "type": "mcq",
+    "text": "Which of the following is true regarding the carpus?",
+    "options": [
+      "(A) The scaphoid articulates proximally with the ulna and has a tubercle.",
+      "(B) The lunate articulates with the ulna and is broader anteriorly than posteriorly.",
+      "(C) The triquetrum articulates proximally with the articular disc of the distal radioulnar joint.",
+      "(D) The pisiform lies on the palmar surface of the trapezium.",
+      "(E) It is composed of seven bones."
+    ],
+    "correct": "(C) The triquetrum articulates proximally with the articular disc of the distal radioulnar joint.",
+    "marks": 1
+  },
+  {
+    "id": 7,
+    "type": "mcq",
+    "text": "Which of the following describes the correct order of the distal row of carpals from lateral to medial?",
+    "options": [
+      "(A) triquetrum, trapezoid, capitate, hamate",
+      "(B) trapezoid, trapezium, capitate, hamate",
+      "(C) trapezium, trapezoid, capitate, hamate",
+      "(D) trapezium, triquetrum, capitate, hamate",
+      "(E) scaphoid, lunate, triquetrum, pisiform"
+    ],
+    "correct": "(C) trapezium, trapezoid, capitate, hamate",
+    "marks": 1
+  },
+  {
+    "id": 8,
+    "type": "mcq",
+    "text": "Which of the following is actually a lateral cutaneous branch of an intercostal nerve, innervating the skin of the medial surface of the arm?",
+    "options": [
+      "(A) intercostobrachial nerve",
+      "(B) superior lateral cutaneous nerve of the arm",
+      "(C) inferior lateral cutaneous nerve of the arm",
+      "(D) medial cutaneous nerve of the arm",
+      "(E) lateral pectoral nerve"
+    ],
+    "correct": "(A) intercostobrachial nerve",
+    "marks": 1
+  },
+  {
+    "id": 9,
+    "type": "mcq",
+    "text": "Which of the following is NOT a branch of the radial nerve?",
+    "options": [
+      "(A) posterior cutaneous nerve of the arm",
+      "(B) posterior cutaneous nerve of the forearm",
+      "(C) inferior lateral cutaneous nerve of the arm",
+      "(D) superior lateral cutaneous nerve of the arm",
+      "(E) posterior interosseous nerve"
+    ],
+    "correct": "(D) superior lateral cutaneous nerve of the arm",
+    "marks": 1
+  },
+  {
+    "id": 10,
+    "type": "mcq",
+    "text": "Which of the following is NOT an anterior thoracoappendicular muscle?",
+    "options": [
+      "(A) pectoralis major",
+      "(B) pectoralis minor",
+      "(C) deltoid",
+      "(D) subclavius",
+      "(E) serratus anterior"
+    ],
+    "correct": "(C) deltoid",
+    "marks": 1
+  },
+  {
+    "id": 11,
+    "type": "mcq",
+    "text": "Which of the following best describes the action of the pectoralis minor?",
+    "options": [
+      "(A) stabilizes scapula by drawing it inferiorly and anteriorly against thoracic wall",
+      "(B) anchors and depresses clavicle",
+      "(C) adducts and medially rotates humerus",
+      "(D) rotates scapula",
+      "(E) flexes humerus"
+    ],
+    "correct": "(A) stabilizes scapula by drawing it inferiorly and anteriorly against thoracic wall",
+    "marks": 1
+  },
+  {
+    "id": 12,
+    "type": "mcq",
+    "text": "Which of the following muscles attaches to the coracoid process of the scapula?",
+    "options": [
+      "(A) pectoralis minor",
+      "(B) triceps brachii",
+      "(C) brachialis",
+      "(D) pectoralis major",
+      "(E) subclavius"
+    ],
+    "correct": "(A) pectoralis minor",
+    "marks": 1
+  },
+  {
+    "id": 13,
+    "type": "mcq",
+    "text": "All of the following are medial rotators of the arm EXCEPT",
+    "options": [
+      "(A) latissimus dorsi",
+      "(B) teres major",
+      "(C) subscapularis",
+      "(D) infraspinatus",
+      "(E) anterior part of deltoid"
+    ],
+    "correct": "(D) infraspinatus",
+    "marks": 1
+  },
+  {
+    "id": 14,
+    "type": "mcq",
+    "text": "What muscles are necessary to raise the arm above the shoulder?",
+    "options": [
+      "(A) first the supraspinatus, next the deltoid, and then the serratus anterior",
+      "(B) first the deltoid, next the supraspinatus, and then the serratus anterior",
+      "(C) first the supraspinatus, next the serratus anterior, and then the deltoid",
+      "(D) first the serratus anterior, next the deltoid, and then the supraspinatus",
+      "(E) first the deltoid, next the serratus anterior, and then supraspinatus"
+    ],
+    "correct": "(A) first the supraspinatus, next the deltoid, and then the serratus anterior",
+    "marks": 1
+  },
+  {
+    "id": 15,
+    "type": "mcq",
+    "text": "Which of the following is innervated by the dorsal scapular nerve?",
+    "options": [
+      "(A) serratus anterior",
+      "(B) rhomboid major and minor",
+      "(C) erector spinae",
+      "(D) subscapularis",
+      "(E) supraspinatus"
+    ],
+    "correct": "(B) rhomboid major and minor",
+    "marks": 1
+  },
+  {
+    "id": 16,
+    "type": "mcq",
+    "text": "Which of the following is an extrinsic shoulder muscle?",
+    "options": [
+      "(A) deltoid",
+      "(B) teres major",
+      "(C) levator scapulae",
+      "(D) teres minor",
+      "(E) supraspinatus"
+    ],
+    "correct": "(C) levator scapulae",
+    "marks": 1
+  },
+  {
+    "id": 17,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the trapezius?",
+    "options": [
+      "(A) It is innervated by the dorsal scapular nerve.",
+      "(B) Its superior fibers retract the scapula.",
+      "(C) Its middle fibers elevate the scapula.",
+      "(D) Its inferior fibers retract the scapula.",
+      "(E) Its superior and inferior fibers act together in rotating the scapula on the thoracic wall."
+    ],
+    "correct": "(E) Its superior and inferior fibers act together in rotating the scapula on the thoracic wall.",
+    "marks": 1
+  },
+  {
+    "id": 18,
+    "type": "mcq",
+    "text": "A patient is asked to place the hands posteriorly on the hips and to push the elbows posteriorly against resistance. Which muscle is being tested?",
+    "options": [
+      "(A) levator scapulae",
+      "(B) rhomboid",
+      "(C) trapezius",
+      "(D) latissimus dorsi",
+      "(E) serratus anterior"
+    ],
+    "correct": "(B) rhomboid",
+    "marks": 1
+  },
+  {
+    "id": 19,
+    "type": "mcq",
+    "text": "Which rotator cuff muscle does NOT rotate the humerus?",
+    "options": [
+      "(A) supraspinatus",
+      "(B) infraspinatus",
+      "(C) teres minor",
+      "(D) subscapularis",
+      "(E) teres major"
+    ],
+    "correct": "(A) supraspinatus",
+    "marks": 1
+  },
+  {
+    "id": 20,
+    "type": "mcq",
+    "text": "The axillary nerve innervates which of the following muscles?",
+    "options": [
+      "(A) coracobrachialis",
+      "(B) teres minor",
+      "(C) teres major",
+      "(D) subscapularis",
+      "(E) levator scapulae"
+    ],
+    "correct": "(B) teres minor",
+    "marks": 1
+  },
+  {
+    "id": 21,
+    "type": "mcq",
+    "text": "Which of the following is NOT contained in the axilla?",
+    "options": [
+      "(A) axillary blood vessels",
+      "(B) lymph nodes",
+      "(C) trunks and divisions of the brachial plexus",
+      "(D) axillary nerve",
+      "(E) lymph nodes"
+    ],
+    "correct": "(C) trunks and divisions of the brachial plexus",
+    "marks": 1
+  },
+  {
+    "id": 22,
+    "type": "mcq",
+    "text": "Which of the following is most correct?",
+    "options": [
+      "(A) The subscapular artery arises from the third part of the axillary artery and contributes to blood supply of muscles near the scapula and humerus.",
+      "(B) The second part of the axillary artery typically contains two branches—the thoracoacromial artery and the superior thoracic artery.",
+      "(C) The first part of the axillary artery lies posterior to the pectoralis minor.",
+      "(D) The thoracoacromial artery supplies the pectoral muscles, axillary lymph nodes, and most importantly the lateral part of the mammary gland in women.",
+      "(E) The lateral thoracic artery divides into four branches, the acromial, deltoid, pectoral, and clavicular."
+    ],
+    "correct": "(A) The subscapular artery arises from the third part of the axillary artery and contributes to blood supply of muscles near the scapula and humerus.",
+    "marks": 1
+  },
+  {
+    "id": 23,
+    "type": "mcq",
+    "text": "Which of the following is NOT correct?",
+    "options": [
+      "(A) The brachial plexus is formed by the union of the ventral rami of C5 through T1.",
+      "(B) The roots of the brachial plexus and the subclavian artery pass through the gap between the anterior and middle scalene muscles.",
+      "(C) Gray rami contribute sympathetic fibers to each root.",
+      "(D) Each of the three trunks of the brachial plexus divide into anterior and posterior divisions.",
+      "(E) The cords of the brachial plexus surround the brachial artery."
+    ],
+    "correct": "(E) The cords of the brachial plexus surround the brachial artery.",
+    "marks": 1
+  },
+  {
+    "id": 24,
+    "type": "mcq",
+    "text": "Which of the following is NOT a supraclavicular branch of the brachial plexus?",
+    "options": [
+      "(A) dorsal scapular nerve",
+      "(B) lateral pectoral nerve",
+      "(C) long thoracic nerve",
+      "(D) nerve to the subclavius",
+      "(E) suprascapular nerve"
+    ],
+    "correct": "(B) lateral pectoral nerve",
+    "marks": 1
+  },
+  {
+    "id": 25,
+    "type": "mcq",
+    "text": "Which of the following is true regarding the quadrangular space?",
+    "options": [
+      "(A) It is bounded superiorly by the teres major.",
+      "(B) It is bounded inferiorly by the subscapularis and teres minor.",
+      "(C) It is bounded medially by the humerus and laterally by the long head of the triceps.",
+      "(D) It contains the posterior circumflex humeral artery and the axillary nerve.",
+      "(E) Brachial plexus herniations occur here."
+    ],
+    "correct": "(D) It contains the posterior circumflex humeral artery and the axillary nerve.",
+    "marks": 1
+  },
+  {
+    "id": 26,
+    "type": "mcq",
+    "text": "Which of the following is NOT innervated by the suprascapular nerve?",
+    "options": [
+      "(A) supraspinatus",
+      "(B) infraspinatus",
+      "(C) glenohumeral joint",
+      "(D) skin over superior part of scapula",
+      "(E) shoulder joint"
+    ],
+    "correct": "(D) skin over superior part of scapula",
+    "marks": 1
+  },
+  {
+    "id": 27,
+    "type": "mcq",
+    "text": "Which of the following is NOT a branch of the posterior cord of the brachial plexus?",
+    "options": [
+      "(A) upper and lower subscapular nerves",
+      "(B) thoracodorsal nerve",
+      "(C) axillary nerve",
+      "(D) radial nerve",
+      "(E) long thoracic nerve"
+    ],
+    "correct": "(E) long thoracic nerve",
+    "marks": 1
+  },
+  {
+    "id": 28,
+    "type": "mcq",
+    "text": "Which of the following is NOT true in respect to the brachialis?",
+    "options": [
+      "(A) Its origin is the distal half of the anterior surface of the humerus.",
+      "(B) Its insertion is the coronoid process and tuberosity of the ulna.",
+      "(C) It flexes the forearm in all positions.",
+      "(D) It is primarily innervated by the musculocutaneous nerve, but some of its lateral part is innervated by a branch of the radial nerve.",
+      "(E) It crosses two joints."
+    ],
+    "correct": "(E) It crosses two joints.",
+    "marks": 1
+  },
+  {
+    "id": 29,
+    "type": "mcq",
+    "text": "A patient is asked to abduct the arm 90 degrees and then to extend the flexed forearm against resistance. Which muscle is being tested?",
+    "options": [
+      "(A) triceps brachii",
+      "(B) brachialis",
+      "(C) coracobrachialis",
+      "(D) biceps brachii",
+      "(E) supinator"
+    ],
+    "correct": "(A) triceps brachii",
+    "marks": 1
+  },
+  {
+    "id": 30,
+    "type": "mcq",
+    "text": "The deep artery of the arm accompanies which of the following before passing around the body of the humerus?",
+    "options": [
+      "(A) radial nerve",
+      "(B) musculocutaneous nerve",
+      "(C) median nerve",
+      "(D) ulnar nerve",
+      "(E) axillary nerve"
+    ],
+    "correct": "(A) radial nerve",
+    "marks": 1
+  },
+  {
+    "id": 31,
+    "type": "mcq",
+    "text": "Which muscle assists in extension of the forearm, resists abduction of the ulna during pronation of the forearm, and tenses the capsule of the elbow joint so that it is not pinched when the joint is extended?",
+    "options": [
+      "(A) anconeus",
+      "(B) triceps brachii",
+      "(C) coracobrachialis",
+      "(D) brachialis",
+      "(E) biceps brachii"
+    ],
+    "correct": "(A) anconeus",
+    "marks": 1
+  },
+  {
+    "id": 32,
+    "type": "mcq",
+    "text": "Which of the following is a branch of the brachial artery?",
+    "options": [
+      "(A) anterior and posterior circumflex humeral arteries",
+      "(B) deltoid artery",
+      "(C) superior and inferior ulnar collateral arteries",
+      "(D) thoracoacromial artery",
+      "(E) anterior and posterior ulnar recurrent arteries"
+    ],
+    "correct": "(C) superior and inferior ulnar collateral arteries",
+    "marks": 1
+  },
+  {
+    "id": 33,
+    "type": "mcq",
+    "text": "Which of the following nerves supply NO branches to the arm?",
+    "options": [
+      "(A) musculocutaneous and median",
+      "(B) radial and ulnar",
+      "(C) median and ulnar",
+      "(D) median and radial",
+      "(E) musculocutaneous and radial"
+    ],
+    "correct": "(C) median and ulnar",
+    "marks": 1
+  },
+  {
+    "id": 34,
+    "type": "mcq",
+    "text": "Which of the following nerves is correctly paired with its cutaneous branch?",
+    "options": [
+      "(A) median nerve and medial antebrachial cutaneous nerve",
+      "(B) musculocutaneous nerve and lateral antebrachial cutaneous nerve",
+      "(C) ulnar nerve and posterior antebrachial cutaneous nerve",
+      "(D) median nerve and medial brachial cutaneous nerve",
+      "(E) radial nerve and superior lateral brachial cutaneous nerve"
+    ],
+    "correct": "(B) musculocutaneous nerve and lateral antebrachial cutaneous nerve",
+    "marks": 1
+  },
+  {
+    "id": 35,
+    "type": "mcq",
+    "text": "The cubital fossa does NOT contain which of the following?",
+    "options": [
+      "(A) terminal part of the brachial artery",
+      "(B) deep accompanying veins of the arteries",
+      "(C) median nerve",
+      "(D) biceps brachii tendon",
+      "(E) ulnar nerve"
+    ],
+    "correct": "(E) ulnar nerve",
+    "marks": 1
+  },
+  {
+    "id": 36,
+    "type": "mcq",
+    "text": "A patient is unable to flex the arm and forearm. Where is the lesion likely to be?",
+    "options": [
+      "(A) ventral rami of C3–C4",
+      "(B) ventral rami of C5–C6–C7",
+      "(C) dorsal rami of C6–C7–C8",
+      "(D) ventral rami of C8–T1",
+      "(E) dorsal rami of T1"
+    ],
+    "correct": "(B) ventral rami of C5–C6–C7",
+    "marks": 1
+  },
+  {
+    "id": 37,
+    "type": "mcq",
+    "text": "The radial nerve innervates muscles in the extensor compartment of the forearm, but it also innervates the following flexor:",
+    "options": [
+      "(A) brachioradialis",
+      "(B) pronator teres",
+      "(C) palmaris longus",
+      "(D) pronator quadratus",
+      "(E) palmaris longus"
+    ],
+    "correct": "(A) brachioradialis",
+    "marks": 1
+  },
+  {
+    "id": 38,
+    "type": "mcq",
+    "text": "Which muscle does NOT cross the elbow joint?",
+    "options": [
+      "(A) flexor pollicis longus",
+      "(B) pronator teres",
+      "(C) flexor carpi radialis",
+      "(D) flexor carpi ulnaris",
+      "(E) flexor digitorum superficialis"
+    ],
+    "correct": "(A) flexor pollicis longus",
+    "marks": 1
+  },
+  {
+    "id": 39,
+    "type": "mcq",
+    "text": "The ulnar nerve innervates which of the following muscles in the flexor compartment?",
+    "options": [
+      "(A) the medial part of the flexor digitorum superficialis",
+      "(B) flexor carpi radialis",
+      "(C) pronator quadratus",
+      "(D) pronator teres",
+      "(E) the medial part of flexor digitorum profundus"
+    ],
+    "correct": "(E) the medial part of flexor digitorum profundus",
+    "marks": 1
+  },
+  {
+    "id": 40,
+    "type": "mcq",
+    "text": "The radial artery lies just lateral to the tendon of which muscle?",
+    "options": [
+      "(A) pronator teres",
+      "(B) flexor carpi radialis",
+      "(C) palmaris longus",
+      "(D) flexor carpi ulnaris",
+      "(E) flexor digitorum superficialis"
+    ],
+    "correct": "(B) flexor carpi radialis",
+    "marks": 1
+  },
+  {
+    "id": 41,
+    "type": "mcq",
+    "text": "The palmaris longus tendon is a useful guide to which nerve at the wrist?",
+    "options": [
+      "(A) anterior interosseous nerve",
+      "(B) posterior interosseous nerve",
+      "(C) median nerve",
+      "(D) ulnar nerve",
+      "(E) radial nerve"
+    ],
+    "correct": "(C) median nerve",
+    "marks": 1
+  },
+  {
+    "id": 42,
+    "type": "mcq",
+    "text": "To pronate the forearm, which of the following must occur?",
+    "options": [
+      "(A) The pronator quadratus initiates pronation, assisted later by the pronator teres.",
+      "(B) The pronator teres initiates pronation, assisted later by the pronator quadratus.",
+      "(C) The anconeus initiates pronation, assisted later by the pronator teres.",
+      "(D) The pronator quadratus initiates pronation, assisted later by the anconeus.",
+      "(E) The ulnar nerve must be used."
+    ],
+    "correct": "(A) The pronator quadratus initiates pronation, assisted later by the pronator teres.",
+    "marks": 1
+  },
+  {
+    "id": 43,
+    "type": "mcq",
+    "text": "The extensor carpi radialis longus tendon is crossed by which two muscles?",
+    "options": [
+      "(A) abductor pollicis longus and extensor pollicis longus",
+      "(B) extensor indicis and extensor digitorum",
+      "(C) extensor digitorum and extensor pollicis brevis",
+      "(D) abductor pollicis longus and extensor pollicis brevis",
+      "(E) extensor indicis and extensor carpi radialis brevis"
+    ],
+    "correct": "(D) abductor pollicis longus and extensor pollicis brevis",
+    "marks": 1
+  },
+  {
+    "id": 44,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the supinator?",
+    "options": [
+      "(A) It is innervated by the ulnar nerve.",
+      "(B) It supinates the forearm by rotating the ulna.",
+      "(C) It forms the floor of the cubital fossa along with the brachioradialis.",
+      "(D) It supinates the forearm when the forearm is already flexed.",
+      "(E) It rotates the radius to turn the palm anteriorly."
+    ],
+    "correct": "(E) It rotates the radius to turn the palm anteriorly.",
+    "marks": 1
+  },
+  {
+    "id": 45,
+    "type": "mcq",
+    "text": "Which of the following does NOT take an origin from the lateral epicondyle of the humerus?",
+    "options": [
+      "(A) extensor carpi radialis brevis",
+      "(B) extensor carpi ulnaris",
+      "(C) abductor pollicis longus",
+      "(D) supinator",
+      "(E) extensor digiti minimi"
+    ],
+    "correct": "(C) abductor pollicis longus",
+    "marks": 1
+  },
+  {
+    "id": 46,
+    "type": "mcq",
+    "text": "Which of the following is correctly paired with its nerve?",
+    "options": [
+      "(A) flexor pollicis longus and anterior interosseous nerve",
+      "(B) flexor digitorum profundus and anterior interosseous nerve",
+      "(C) extensor carpi radialis longus and posterior interosseous nerve",
+      "(D) brachioradialis and posterior interosseous nerve",
+      "(E) abductor pollicis longus and anterior interosseous nerve"
+    ],
+    "correct": "(A) flexor pollicis longus and anterior interosseous nerve",
+    "marks": 1
+  },
+  {
+    "id": 47,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the anatomical snuff box?",
+    "options": [
+      "(A) It is bounded anteriorly by the tendons of the extensor pollicis longus.",
+      "(B) It is bounded posteriorly by the tendons of the abductor pollicis longus and extensor pollicis brevis.",
+      "(C) The radial artery lies in the floor of the snuff box.",
+      "(D) The scaphoid and triquetrum can be palpated within the snuff box.",
+      "(E) The snuff box is visible when the thumb is fully flexed."
+    ],
+    "correct": "(C) The radial artery lies in the floor of the snuff box.",
+    "marks": 1
+  },
+  {
+    "id": 48,
+    "type": "mcq",
+    "text": "Which of the following does NOT abduct the hand at the wrist joint?",
+    "options": [
+      "(A) flexor carpi radialis",
+      "(B) extensor carpi radialis longus",
+      "(C) extensor carpi radialis brevis",
+      "(D) abductor pollicis longus",
+      "(E) palmaris longus"
+    ],
+    "correct": "(E) palmaris longus",
+    "marks": 1
+  },
+  {
+    "id": 49,
+    "type": "mcq",
+    "text": "Which of the following is derived from the radial artery?",
+    "options": [
+      "(A) dorsal and palmar carpal arteries",
+      "(B) common interosseous artery",
+      "(C) anterior interosseous artery",
+      "(D) poster interosseous artery",
+      "(E) ulnar recurrent artery"
+    ],
+    "correct": "(A) dorsal and palmar carpal arteries",
+    "marks": 1
+  },
+  {
+    "id": 50,
+    "type": "mcq",
+    "text": "The median nerve does which of the following?",
+    "options": [
+      "(A) innervates the elbow joint with articular branches",
+      "(B) innervates the medial half of the flexor digitorum profundus",
+      "(C) innervates the hypothenar muscles",
+      "(D) innervates lumbricals 3 and 4",
+      "(E) innervates the skin of the dorsum of the hand"
+    ],
+    "correct": "(A) innervates the elbow joint with articular branches",
+    "marks": 1
+  },
+  {
+    "id": 51,
+    "type": "mcq",
+    "text": "The ulnar nerve does NOT do which of the following?",
+    "options": [
+      "(A) innervate the elbow joint with articular branches",
+      "(B) innervate the flexor carpi ulnaris",
+      "(C) innervate the skin on the lateral part of the palm and dorsum of the hand",
+      "(D) innervate the adductor pollicis",
+      "(E) innervate the dorsal and palmar interossei"
+    ],
+    "correct": "(C) innervate the skin on the lateral part of the palm and dorsum of the hand",
+    "marks": 1
+  },
+  {
+    "id": 52,
+    "type": "mcq",
+    "text": "The radial nerve does NOT do which of the following?",
+    "options": [
+      "(A) give a superficial branch that innervates the dorsum of the hand",
+      "(B) innervate the brachioradialis and extensor carpi radialis longus",
+      "(C) give a deep branch that innervates the extensor carpi radialis brevis and supinator",
+      "(D) give a posterior interosseous branch that innervates all remaining extensor muscles in the posterior compartment of the forearm",
+      "(E) innervate the glenohumeral joint"
+    ],
+    "correct": "(E) innervate the glenohumeral joint",
+    "marks": 1
+  },
+  {
+    "id": 53,
+    "type": "mcq",
+    "text": "Which of the following is NOT true in respect to the flexor pollicis brevis?",
+    "options": [
+      "(A) It is located medial to the abductor pollicis brevis.",
+      "(B) It flexes the thumb at the carpometacarpal joint.",
+      "(C) It flexes the thumb at the metacarpophalangeal joint.",
+      "(D) Its tendon typically contains a sesamoid bone.",
+      "(E) It is innervated by C5–C6."
+    ],
+    "correct": "(E) It is innervated by C5–C6.",
+    "marks": 1
+  },
+  {
+    "id": 54,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the palmaris brevis?",
+    "options": [
+      "(A) It aids the palmaris longus in tightening the palmar aponeurosis.",
+      "(B) It is innervated by the median nerve.",
+      "(C) It is in the hypothenar compartment.",
+      "(D) It covers and protects the radial artery.",
+      "(E) It wrinkles the skin of the hypothenar eminence and deepens the hollow of the palm."
+    ],
+    "correct": "(E) It wrinkles the skin of the hypothenar eminence and deepens the hollow of the palm.",
+    "marks": 1
+  },
+  {
+    "id": 55,
+    "type": "mcq",
+    "text": "The recurrent branch of the median nerve does NOT innervate which of the following?",
+    "options": [
+      "(A) abductor pollicis brevis",
+      "(B) adductor pollicis",
+      "(C) flexor pollicis brevis",
+      "(D) opponens pollicis",
+      "(E) The recurrent branch of the median nerve innervates all of the above."
+    ],
+    "correct": "(B) adductor pollicis",
+    "marks": 1
+  },
+  {
+    "id": 56,
+    "type": "mcq",
+    "text": "Which of the following muscles is correctly matched with the accompanying description?",
+    "options": [
+      "(A) lumbricals 1 and 2 . . . bipennate",
+      "(B) lumbricals 3 and 4 . . . unipennate",
+      "(C) dorsal interossei 1–4 . . . bipennate",
+      "(D) palmar interossei 1–3 . . . bipennate",
+      "(E) deltoid . . . bipennate"
+    ],
+    "correct": "(C) dorsal interossei 1–4 . . . bipennate",
+    "marks": 1
+  },
+  {
+    "id": 57,
+    "type": "mcq",
+    "text": "The deep branch of the ulnar does NOT innervate which of the following?",
+    "options": [
+      "(A) abductor digiti minimi",
+      "(B) flexor digiti minimi brevis",
+      "(C) lumbricals 1 and 2",
+      "(D) dorsal interossei 3 and 4",
+      "(E) palmar interossei 1 and 2"
+    ],
+    "correct": "(C) lumbricals 1 and 2",
+    "marks": 1
+  },
+  {
+    "id": 58,
+    "type": "mcq",
+    "text": "The carpal tunnel does NOT contain which of the following?",
+    "options": [
+      "(A) median nerve",
+      "(B) four tendons of the flexor digitorum superficialis",
+      "(C) four tendons of the flexor digitorum profundus",
+      "(D) the tendon of the flexor pollicis longus",
+      "(E) ulnar nerve"
+    ],
+    "correct": "(E) ulnar nerve",
+    "marks": 1
+  },
+  {
+    "id": 59,
+    "type": "mcq",
+    "text": "The sternoclavicular joint . . .",
+    "options": [
+      "(A) . . . is a saddle-type synovial joint but functions as a ball-and-socket joint.",
+      "(B) . . . is supplied by lateral thoracic and thoracoacromial arteries.",
+      "(C) . . . is innervated by the lateral and medial pectoral nerves.",
+      "(D) . . . is the articulation of the clavicle and gladiolus of the sternum.",
+      "(E) . . . dislocates easily."
+    ],
+    "correct": "(A) . . . is a saddle-type synovial joint but functions as a ball-and-socket joint.",
+    "marks": 1
+  },
+  {
+    "id": 60,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the acromioclavicular joint?",
+    "options": [
+      "(A) It is a saddle-type synovial joint.",
+      "(B) It is strengthened by the coracohumeral and transverse humeral ligaments.",
+      "(C) It is supplied by the lateral thoracic arteries.",
+      "(D) It is innervated by the nerve to the subclavius.",
+      "(E) When dislocated, it is often referred to as a \"separated shoulder.\""
+    ],
+    "correct": "(E) When dislocated, it is often referred to as a \"separated shoulder.\"",
+    "marks": 1
+  },
+  {
+    "id": 61,
+    "type": "mcq",
+    "text": "Which of the following flexes the arm at the glenohumeral joint?",
+    "options": [
+      "(A) deltoid (posterior part)",
+      "(B) pectoralis major",
+      "(C) latissimus dorsi",
+      "(D) subscapularis",
+      "(E) infraspinatus"
+    ],
+    "correct": "(B) pectoralis major",
+    "marks": 1
+  },
+  {
+    "id": 62,
+    "type": "mcq",
+    "text": "In respect to movement of the arm at the glenohumeral joint, which of the following movements is correctly paired with its prime mover?",
+    "options": [
+      "(A) extension . . . deltoid (posterior part)",
+      "(B) abduction . . . pectoralis major and latissimus dorsi",
+      "(C) adduction . . . deltoid",
+      "(D) medial rotation . . . infraspinatus",
+      "(E) lateral rotation . . . subscapularis"
+    ],
+    "correct": "(A) extension . . . deltoid (posterior part)",
+    "marks": 1
+  },
+  {
+    "id": 63,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to the elbow joint?",
+    "options": [
+      "(A) It is a plane type of synovial joint.",
+      "(B) It is strengthened by the radial and ulnar cruciate ligaments.",
+      "(C) It is supplied by the cephalic and basilic arteries.",
+      "(D) It is innervated by the median and axillary nerves.",
+      "(E) It is surrounded by the intratendinous olecranon bursa, the subtendinous olecranon bursa, and the subcutaneous olecranon bursa."
+    ],
+    "correct": "(E) It is surrounded by the intratendinous olecranon bursa, the subtendinous olecranon bursa, and the subcutaneous olecranon bursa.",
+    "marks": 1
+  },
+  {
+    "id": 64,
+    "type": "mcq",
+    "text": "Which of the following joints is paired correctly with its type?",
+    "options": [
+      "(A) proximal and distal radioulnar joints . . . condyloid type of synovial joint",
+      "(B) radiocarpal joint . . . pivot type of synovial joint",
+      "(C) intercarpal joints . . . plane type of synovial joints",
+      "(D) metacarpophalangeal joints . . . hinge type of synovial joints",
+      "(E) interphalangeal joints . . . condyloid type of synovial joints"
+    ],
+    "correct": "(C) intercarpal joints . . . plane type of synovial joints",
+    "marks": 1
+  },
+  {
+    "id": 65,
+    "type": "mcq",
+    "text": "All carpometacarpal and intermetacarpal joints are plane types of synovial joints EXCEPT for",
+    "options": [
+      "(A) the carpometacarpal joint of the thumb.",
+      "(B) the carpometacarpal joint of the fifth metacarpal.",
+      "(C) the carpometacarpal joint of the third metacarpal.",
+      "(D) the intermetacarpal joint of the 4th and 5th metacarpals.",
+      "(E) the intermetacarpal joint of the 1st and 2nd metacarpals."
+    ],
+    "correct": "(A) the carpometacarpal joint of the thumb.",
+    "marks": 1
+  },
+  {
+    "id": 66,
+    "type": "mcq",
+    "text": "Which of the following is NOT true in respect to the clavicle?",
+    "options": [
+      "(A) The clavicle varies more in shape than most other long bones.",
+      "(B) The clavicle can be pierced by a branch of the supraclavicular nerve.",
+      "(C) The clavicle is thicker and more curved in manual workers.",
+      "(D) The right clavicle is stronger than the left and is usually shorter.",
+      "(E) The clavicle is a compact bone."
+    ],
+    "correct": "(E) The clavicle is a compact bone.",
+    "marks": 1
+  },
+  {
+    "id": 67,
+    "type": "mcq",
+    "text": "Fractures of the scapula typically involve",
+    "options": [
+      "(A) the acromion.",
+      "(B) the coracoid process.",
+      "(C) the spine.",
+      "(D) the inferior angle.",
+      "(E) the suprascapular notch."
+    ],
+    "correct": "(A) the acromion.",
+    "marks": 1
+  },
+  {
+    "id": 68,
+    "type": "mcq",
+    "text": "Which of the following parts of the humerus is matched correctly with the nerve with which it is in direct contact?",
+    "options": [
+      "(A) distal end of humerus . . . radial nerve",
+      "(B) surgical neck . . . musculocutaneous nerve",
+      "(C) radial groove . . . musculocutaneous nerve",
+      "(D) medial epicondyle . . . ulnar nerve",
+      "(E) scapular notch . . . suprascapular nerve"
+    ],
+    "correct": "(D) medial epicondyle . . . ulnar nerve",
+    "marks": 1
+  },
+  {
+    "id": 69,
+    "type": "mcq",
+    "text": "“Winging” of the scapula is most likely caused by which of the following?",
+    "options": [
+      "(A) a lesion to the long thoracic nerve",
+      "(B) a lesion to the thoracodorsal nerve",
+      "(C) injury to the suprascapular nerve",
+      "(D) damage to the dorsal scapular nerve",
+      "(E) damage to the upper and lower subscapular nerves"
+    ],
+    "correct": "(A) a lesion to the long thoracic nerve",
+    "marks": 1
+  },
+  {
+    "id": 70,
+    "type": "mcq",
+    "text": "Which of the following is correct regarding the triangle of auscultation?",
+    "options": [
+      "(A) Its borders are the latissimus dorsi, scapula, and trapezius.",
+      "(B) It is a good location to hear heart murmurs.",
+      "(C) The 8th and 9th ribs and the 8th intercostal space are subcutaneous here.",
+      "(D) It is a location of back trauma.",
+      "(E) It is a location for dorsal rami to pass to the superficial back."
+    ],
+    "correct": "(A) Its borders are the latissimus dorsi, scapula, and trapezius.",
+    "marks": 1
+  },
+  {
+    "id": 71,
+    "type": "mcq",
+    "text": "A patient cannot raise the trunk (as in climbing). What is most likely the problem?",
+    "options": [
+      "(A) damage to the ventral rami of C5–C6–C7",
+      "(B) paralysis of the latissimus dorsi",
+      "(C) injury to the dorsal scapular nerve",
+      "(D) damage to the dorsal rami of C8–T1",
+      "(E) injury to the axillary nerve"
+    ],
+    "correct": "(B) paralysis of the latissimus dorsi",
+    "marks": 1
+  },
+  {
+    "id": 72,
+    "type": "mcq",
+    "text": "The scapula on one side of a patient is located farther from the midline than that on the normal side. What might be the problem?",
+    "options": [
+      "(A) paralysis of the rhomboids on one side",
+      "(B) injury to the long thoracic nerve",
+      "(C) a lesion of C7–C8",
+      "(D) dislocated shoulder",
+      "(E) separated shoulder"
+    ],
+    "correct": "(A) paralysis of the rhomboids on one side",
+    "marks": 1
+  },
+  {
+    "id": 73,
+    "type": "mcq",
+    "text": "The axillary nerve is damaged. What is the likely result?",
+    "options": [
+      "(A) The teres major atrophies.",
+      "(B) The rounded contour of the shoulder disappears.",
+      "(C) A loss of sensation may occur in the lateral forearm.",
+      "(D) The patient may lose the ability to adduct the arm.",
+      "(E) The patient may exhibit “wrist-drop.”"
+    ],
+    "correct": "(B) The rounded contour of the shoulder disappears.",
+    "marks": 1
+  },
+  {
+    "id": 74,
+    "type": "mcq",
+    "text": "Which of the following is true regarding rotator cuff injuries?",
+    "options": [
+      "(A) Injury or disease may damage the rotator cuff, causing instability of the acromioclavicular joint.",
+      "(B) The supraspinatus tendon is the most commonly torn part of the rotator cuff.",
+      "(C) The teres major takes the longest to rehabilitate of the rotator cuff muscles.",
+      "(D) The injuries occur when the muscles pull away from their origin on the acromion.",
+      "(E) Acute tears are common in young persons."
+    ],
+    "correct": "(B) The supraspinatus tendon is the most commonly torn part of the rotator cuff.",
+    "marks": 1
+  },
+  {
+    "id": 75,
+    "type": "mcq",
+    "text": "A patient has been thrown from a motorcycle, landing on the shoulder such that the neck and shoulder are widely separated. You suspect an upper brachial plexus injury. What signs do you expect?",
+    "options": [
+      "(A) “clawhand”",
+      "(B) paralysis of flexor carpi ulnaris, flexor digitorum superficialis, and flexor digitorum profundus",
+      "(C) adducted shoulder, medially rotated arm, and extended elbow",
+      "(D) loss of sensation in the medial forearm",
+      "(E) “wrist-drop”"
+    ],
+    "correct": "(C) adducted shoulder, medially rotated arm, and extended elbow",
+    "marks": 1
+  },
+  {
+    "id": 76,
+    "type": "mcq",
+    "text": "A patient exhibits “clawhand.” What might have happened?",
+    "options": [
+      "(A) upper brachial plexus injury",
+      "(B) acute brachial plexus neuritis",
+      "(C) compression of the cords of the brachial plexus",
+      "(D) lower brachial plexus injury",
+      "(E) damage to dorsal rami that send fibers to the brachial plexus"
+    ],
+    "correct": "(D) lower brachial plexus injury",
+    "marks": 1
+  },
+  {
+    "id": 77,
+    "type": "mcq",
+    "text": "A patient receives a knife wound to the axilla. What problems do you expect?",
+    "options": [
+      "(A) damage to the axillary nerve",
+      "(B) paralysis of the coracobrachialis, biceps, and brachialis",
+      "(C) inability to extend the wrist and digits at the metacarpophalangeal joints",
+      "(D) loss of sensation on the medial surface of the arm",
+      "(E) “clawhand”"
+    ],
+    "correct": "(B) paralysis of the coracobrachialis, biceps, and brachialis",
+    "marks": 1
+  },
+  {
+    "id": 78,
+    "type": "mcq",
+    "text": "A patient tries to make a fist, but digits 2 and 3 remain partially extended. What nerve is injured?",
+    "options": [
+      "(A) ulnar nerve",
+      "(B) radial nerve",
+      "(C) median nerve",
+      "(D) musculocutaneous nerve",
+      "(E) axillary nerve"
+    ],
+    "correct": "(C) median nerve",
+    "marks": 1
+  },
+  {
+    "id": 79,
+    "type": "mcq",
+    "text": "Which of the following is true in respect to ulnar nerve injuries?",
+    "options": [
+      "(A) The injury often occurs where the nerve passes posterior to the medial epicondyle of the humerus.",
+      "(B) The patient experiences numbness and tingling on the lateral part of the palm and the thumb.",
+      "(C) The patient may exhibit “waiter’s tip hand.”",
+      "(D) Patients have difficulty because they cannot flex their first, second, and third digits at the DIP joints.",
+      "(E) Power of abduction is impaired, and when the patient attempts to flex the wrist, the flexor carpi ulnaris brings the hand to the medial side."
+    ],
+    "correct": "(A) The injury often occurs where the nerve passes posterior to the medial epicondyle of the humerus.",
+    "marks": 1
+  },
+  {
+    "id": 80,
+    "type": "mcq",
+    "text": "Which limb defect is correctly matched with its definition?",
+    "options": [
+      "(A) meromelia . . . complete absence of one or more extremities",
+      "(B) phocomelia . . . all segments of extremities are present but abnormally short",
+      "(C) micromelia . . . partial absence of one or more extremities",
+      "(D) amelia . . . long bones are absent, and small hands or feet are attached to the trunk by short, irregular bones",
+      "(E) cleft hand (lobster claw deformity) . . . absent third metacarpal, fusion of digits 1–2 and 4–5"
+    ],
+    "correct": "(E) cleft hand (lobster claw deformity) . . . absent third metacarpal, fusion of digits 1–2 and 4–5",
+    "marks": 1
+  },
+  {
+    "id": 81,
+    "type": "mcq",
+    "text": "Syndactylyl involves",
+    "options": [
+      "(A) extra fingers or toes.",
+      "(B) absence of a digit or limb.",
+      "(C) abnormal fusion of fingers and toes.",
+      "(D) small hands or feet being attached to trunk by short bones instead of long bones.",
+      "(E) congenital dislocation of glenohumeral joint."
+    ],
+    "correct": "(C) abnormal fusion of fingers and toes.",
+    "marks": 1
+  },
+  {
+    "id": 82,
+    "type": "mcq",
+    "text": "Which of the following is NOT correct?",
+    "options": [
+      "(A) During development, dorsal cells organize as the epimere and ventral cells organize as the hypomere.",
+      "(B) Dorsal rami innervate muscles derived from the epimere.",
+      "(C) Ventral rami innervate muscles derived from the hypomere.",
+      "(D) Myoblasts of the hypomere form the extensor muscles of the vertebral column.",
+      "(E) Somites and somitomeres form the musculature of the limbs."
+    ],
+    "correct": "(D) Myoblasts of the hypomere form the extensor muscles of the vertebral column.",
+    "marks": 1
+  },
+  {
+    "id": 83,
+    "type": "mcq",
+    "text": "A patient in surgery has no pectoralis major. What do you suspect?",
+    "options": [
+      "(A) trauma",
+      "(B) dominant pectoralis minor",
+      "(C) drug-induced muscle hypoplasia",
+      "(D) atrophy of the muscle",
+      "(E) congenital absence of the muscle"
+    ],
+    "correct": "(E) congenital absence of the muscle",
+    "marks": 1
+  }
+];
+
+    const PAGE_SIZE = 20;
+    const testId = "upper_limb_anatomy";
+    let currentPage = 1;
+    let answers = {};
+    let isSubmitted = false;
+
+    // ── Core Logic ──
+
+    function init() {
+      loadProgress();
+      renderPage(1);
+      setupEventListeners();
+      updateProgress();
+    }
+
+    function renderPage(pageNumber) {
+      currentPage = pageNumber;
+      const start = (pageNumber - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageQuestions = questions.slice(start, end);
+
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+
+      pageQuestions.forEach(q => {
+        const card = createQuestionCard(q);
+        container.appendChild(card);
+      });
+
+      updatePagination();
+      window.scrollTo(0, 0);
+    }
+
+    function createQuestionCard(q) {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.id = `q-${q.id}`;
+
+      const header = `
+        <div class="type-label type-${q.type}">${q.type}</div>
+        <div class="question-header">
+          <div class="question-text"><strong>${q.id}.</strong> ${q.text}</div>
+          <div class="marks-badge">${q.marks} Marks</div>
+        </div>
+      `;
+
+      let body = '';
+      if (q.type === 'mcq') {
+        body = `<div class="options">` + 
+          q.options.map((opt, idx) => {
+            const isSelected = answers[q.id] === opt;
+            const name = `q${q.id}`;
+            const optId = `q${q.id}opt${idx}`;
+            
+            let extraClass = '';
+            if (isSubmitted && q.correct) {
+                if (opt === q.correct) extraClass = 'opt-correct';
+                else if (isSelected) extraClass = 'opt-wrong';
+            }
+
+            return `
+              <label class="option-label ${extraClass}" for="${optId}">
+                <input type="radio" name="${name}" id="${optId}" value="${opt}" 
+                  ${isSelected ? 'checked' : ''} ${isSubmitted ? 'disabled' : ''}>
+                <span>${opt}</span>
+              </label>
+            `;
+          }).join('') + `</div>`;
+      } else {
+        const val = answers[q.id] || '';
+        body = q.type === 'short' 
+          ? `<input type="text" class="short-input" value="${val}" ${isSubmitted ? 'disabled' : ''} placeholder="Your answer...">`
+          : `<textarea class="essay-input" ${isSubmitted ? 'disabled' : ''} placeholder="Write your response...">${val}</textarea>`;
+      }
+
+      card.innerHTML = header + body;
+
+      // Event listeners for inputs
+      if (!isSubmitted) {
+        card.querySelectorAll('input, textarea').forEach(input => {
+          input.addEventListener('change', (e) => {
+            answers[q.id] = e.target.value;
+            saveProgress();
+            updateProgress();
+          });
+        });
+      }
+
+      return card;
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(questions.length / PAGE_SIZE);
+      document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('btn-prev').disabled = currentPage === 1;
+      document.getElementById('btn-next').disabled = currentPage === totalPages;
+      document.getElementById('pagination-bar').style.display = totalPages > 1 ? 'flex' : 'none';
+    }
+
+    function updateProgress() {
+      const total = questions.length;
+      const answered = Object.keys(answers).length;
+      const percent = (answered / total) * 100;
+      
+      document.getElementById('progress-label').textContent = `${answered} / ${total} answered`;
+      document.getElementById('progress-fill').style.width = `${percent}%`;
+    }
+
+    function saveProgress() {
+      localStorage.setItem(`medtest_answers_${testId}`, JSON.stringify(answers));
+      showToast();
+    }
+
+    function loadProgress() {
+      const saved = localStorage.getItem(`medtest_answers_${testId}`);
+      if (saved) answers = JSON.parse(saved);
+      
+      const submitted = localStorage.getItem(`medtest_submitted_${testId}`);
+      if (submitted === 'true') {
+        isSubmitted = true;
+        document.getElementById('btn-submit').disabled = true;
+        document.getElementById('btn-retake').style.display = 'block';
+        showReviewBanner();
+      }
+    }
+
+    function showToast() {
+      const toast = document.getElementById('save-toast');
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 1500);
+    }
+
+    function setupEventListeners() {
+      document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentPage > 1) renderPage(currentPage - 1);
+      });
+      document.getElementById('btn-next').addEventListener('click', () => {
+        const totalPages = Math.ceil(questions.length / PAGE_SIZE);
+        if (currentPage < totalPages) renderPage(currentPage + 1);
+      });
+      document.getElementById('btn-submit').addEventListener('click', submitTest);
+      document.getElementById('btn-retake').addEventListener('click', retakeTest);
+      document.getElementById('btn-save-session').addEventListener('click', saveSession);
+      document.getElementById('btn-load-session').addEventListener('click', toggleSessionPanel);
+    }
+
+    function submitTest() {
+      if (!confirm('Are you sure you want to submit? This will lock your answers.')) return;
+      
+      isSubmitted = true;
+      localStorage.setItem(`medtest_submitted_${testId}`, 'true');
+      document.getElementById('btn-submit').disabled = true;
+      document.getElementById('btn-retake').style.display = 'block';
+      
+      showReviewBanner();
+      renderPage(currentPage); // Re-render to show highlights
+    }
+
+    function showReviewBanner() {
+      const total = questions.length;
+      const answered = Object.keys(answers).length;
+      
+      const banner = document.createElement('div');
+      banner.className = 'review-banner';
+      banner.innerHTML = `
+        <strong>Test Submitted</strong>
+        Review your performance below. Correct answers are highlighted in green.
+        <p>${answered} of ${total} questions attempted.</p>
+      `;
+      
+      const container = document.getElementById('review-banner-container');
+      container.innerHTML = '';
+      container.appendChild(banner);
+    }
+
+    function retakeTest() {
+      if (!confirm('Clear all answers and retake?')) return;
+      
+      answers = {};
+      isSubmitted = false;
+      localStorage.removeItem(`medtest_answers_${testId}`);
+      localStorage.removeItem(`medtest_submitted_${testId}`);
+      
+      document.getElementById('btn-submit').disabled = false;
+      document.getElementById('btn-retake').style.display = 'none';
+      document.getElementById('review-banner-container').innerHTML = '';
+      
+      renderPage(1);
+      updateProgress();
+    }
+
+    // ── Session Management ──
+
+    function saveSession() {
+      const name = prompt('Enter a name for this session:');
+      if (!name) return;
+      
+      const sessions = JSON.parse(localStorage.getItem('medtest_sessions') || '[]');
+      sessions.push({
+        id: Date.now(),
+        testId: testId,
+        name: name,
+        answers: answers,
+        date: new Date().toLocaleDateString()
+      });
+      localStorage.setItem('medtest_sessions', JSON.stringify(sessions));
+      alert('Session saved!');
+    }
+
+    function toggleSessionPanel() {
+      const panel = document.getElementById('session-panel');
+      if (panel.style.display === 'none') {
+        renderSessions();
+        panel.style.display = 'block';
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+
+    function renderSessions() {
+      const list = document.getElementById('session-list');
+      const sessions = JSON.parse(localStorage.getItem('medtest_sessions') || '[]')
+                         .filter(s => s.testId === testId);
+      
+      if (sessions.length === 0) {
+        list.innerHTML = '<p style="font-size: 0.8rem; color: var(--ink-muted);">No saved sessions.</p>';
+        return;
+      }
+
+      list.innerHTML = sessions.map(s => `
+        <div class="session-item" onclick="loadSession(${s.id})">
+          <span>${s.name} (${s.date})</span>
+          <span style="font-size: 0.7rem; opacity: 0.6;">Click to load</span>
+        </div>
+      `).join('');
+    }
+
+    window.loadSession = function(id) {
+      const sessions = JSON.parse(localStorage.getItem('medtest_sessions') || '[]');
+      const session = sessions.find(s => s.id === id);
+      if (session) {
+        answers = session.answers;
+        saveProgress();
+        renderPage(1);
+        updateProgress();
+        document.getElementById('session-panel').style.display = 'none';
+        alert('Session loaded!');
+      }
+    };
+
+    init();
+  </script>
+</body>
+</html>
